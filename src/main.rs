@@ -1,8 +1,9 @@
-mod database;
-mod entities;
-mod request_handler;
+pub mod database;
+pub mod entities;
+pub mod request_handler;
 
-use crate::request_handler::article;
+use crate::request_handler::article::get;
+use database::database::connect;
 
 use std::{
     fs,
@@ -11,8 +12,8 @@ use std::{
 };
 
 fn main() {
+    let _ = connect();
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
-
     for stream in listener.incoming() {
         let stream = stream.unwrap();
         // TODO: add multi threading: https://doc.rust-lang.org/book/ch20-02-multithreaded.html
@@ -30,7 +31,7 @@ fn handle_connection(mut stream: TcpStream) {
     println!("Incoming Request: {:#?}", http_request);
     let (http_method, path) = http_request[0].split_at(http_request[0].find(" ").unwrap());
     if http_method == "GET" && path.trim().starts_with("/articles") {
-        article::get(&mut stream);
+        get(&mut stream);
     } else {
         repond_with_error(&mut stream);
     }

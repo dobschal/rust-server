@@ -4,17 +4,38 @@ pub mod database {
 
     use crate::entities::entities::User;
 
-    pub fn request_database() -> std::result::Result<Vec<User>, Box<dyn std::error::Error>> {
-        println!("Request database...");
+    static mut POOL: Option<Pool> = None;
+
+    pub fn connect() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        println!("Connect to database...");
         let url = "mysql://root:root@localhost:3306/rust-test";
-        let pool = Pool::new(url)?;
+        unsafe {
+            POOL = Some(Pool::new(url)?);
+            println!("Connected to database.")
+        }
+        return Ok(());
+    }
 
-        let mut conn = pool.get_conn()?;
-
-        let users = conn.query_map("SELECT id, name from user", |(id, name)| User { id, name })?;
-
+    pub fn get_users() -> Vec<User> {
+        println!("Request database...");
+        let users = get_connection()
+            .query_map("SELECT id, name from user", |(id, name)| User { id, name })
+            .expect("Could not get users...");
         println!("Users: {:?}", users);
+        return users;
+    }
 
-        return Ok(users);
+    fn get_connection() -> PooledConn {
+        unsafe {
+            if POOL.is_none() {
+                panic!("Fist connect to database");
+            }
+            let conn = POOL
+                .clone()
+                .unwrap()
+                .get_conn()
+                .expect("Sorry no database connection...");
+            return conn;
+        }
     }
 }
