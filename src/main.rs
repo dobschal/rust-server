@@ -29,6 +29,9 @@ fn handle_connection(mut stream: TcpStream) {
         .collect();
     println!("Incoming Request: {:#?}", http_request);
     let (http_method, path) = http_request[0].split_at(http_request[0].find(" ").unwrap());
+    // TODO: Have dynamic mapping for controllers to be called based on path and HTTP method
+    // TODO: read payload of POST HTTP requests
+    // TODO: handle query params
     if http_method == "GET" && path.trim().starts_with("/users") {
         get_users(&mut stream);
     } else {
@@ -36,6 +39,7 @@ fn handle_connection(mut stream: TcpStream) {
     }
 }
 
+// TODO: have generic error response method
 fn repond_with_error(stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 404 NOT FOUND";
     let contents = fs::read_to_string("static/404.html").unwrap();

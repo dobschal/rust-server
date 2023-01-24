@@ -1,19 +1,36 @@
+use crate::database;
+use serde_json::json;
 use std::{fs, io::Write, net::TcpStream};
 
-use crate::database;
+static RETURN_JSON: bool = true;
 
+//  This controller method loads all users from the MySQL database
+//  depending on the RETURN_JSON flag, it returns JSON or HTML
+//  the database module holds a MySQL connection pool that gets fetched first
+//
 pub fn get_users(stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 200 OK";
-    let mut contents = fs::read_to_string("static/users.html").unwrap();
-    let users = database::get_users()
-        .iter()
-        .map(|user| format!("<li>{}</li>", user.name.as_ref().unwrap()))
-        .collect::<Vec<String>>()
-        .join("\r\n");
-    contents = contents.replace("#_USERS", &users);
+    let users = database::get_users();
+    let contents = if RETURN_JSON {
+        json!(users).to_string()
+    } else {
+        let users_print = users
+            .iter()
+            .map(|user| format!("<li>{}</li>", user.name.as_ref().unwrap()))
+            .collect::<Vec<String>>()
+            .join("\r\n");
+        fs::read_to_string("static/users.html")
+            .unwrap()
+            .replace("#_USERS", &users_print)
+    };
     let length = contents.len();
+    let content_type = if RETURN_JSON {
+        "application/json"
+    } else {
+        "text/html"
+    };
     let response = format!(
-        "{status_line}\r\nContent-Length: {length}\r\nContent-Type: text/html\r\n\r\n{contents}"
+        "{status_line}\r\nContent-Length: {length}\r\nContent-Type: {content_type}\r\n\r\n{contents}"
     );
     stream.write_all(response.as_bytes()).unwrap();
 }
