@@ -24,8 +24,9 @@ INSERT INTO `user` (`id`, `name`) VALUES
 ### Build and Run
 Install Cargo and run in terminal:
 ```bash
-cargo build # fetches necessary dependencies before build automatically
-cargo run # will run the server on http://localhost:7878
+# fetches necessary dependencies before build/run automatically
+# will run the server on http://localhost:7878
+cargo run 
 ```
 
 ### Test

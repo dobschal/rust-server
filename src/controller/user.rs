@@ -4,6 +4,17 @@ use std::{fs, io::Write, net::TcpStream};
 
 static RETURN_JSON: bool = true;
 
+pub fn fake(stream: &mut TcpStream) {
+    println!("fake");
+    let contents = "{\"success\": true }".to_owned();
+    let length = contents.len();
+    stream
+        .write_all(
+            format!("HTTP/1.1 200 OK\r\nContent-Length: {length}\r\nContent-Type: application/json\r\n\r\n{contents}").as_bytes(),
+        )
+        .unwrap();
+}
+
 //  This controller method loads all users from the MySQL database
 //  depending on the RETURN_JSON flag, it returns JSON or HTML
 //  the database module holds a MySQL connection pool that gets fetched first

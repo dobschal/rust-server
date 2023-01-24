@@ -6,11 +6,10 @@ pub use user::get_users;
 static mut POOL: Option<Pool> = None;
 
 pub fn connect() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    println!("Connect to database...");
     let url = "mysql://root:root@localhost:3306/rust-test";
     unsafe {
         POOL = Some(Pool::new(url)?);
-        println!("Connected to database.")
+        println!("\n\r🔗 Connected to database.")
     }
     return Ok(());
 }
