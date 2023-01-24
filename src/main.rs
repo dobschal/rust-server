@@ -1,9 +1,8 @@
+pub mod controller;
 pub mod database;
-pub mod entities;
-pub mod request_handler;
+pub mod entity;
 
-use crate::request_handler::article::get;
-use database::database::connect;
+use crate::{controller::get_users, database::connect};
 
 use std::{
     fs,
@@ -30,8 +29,8 @@ fn handle_connection(mut stream: TcpStream) {
         .collect();
     println!("Incoming Request: {:#?}", http_request);
     let (http_method, path) = http_request[0].split_at(http_request[0].find(" ").unwrap());
-    if http_method == "GET" && path.trim().starts_with("/articles") {
-        get(&mut stream);
+    if http_method == "GET" && path.trim().starts_with("/users") {
+        get_users(&mut stream);
     } else {
         repond_with_error(&mut stream);
     }
@@ -39,7 +38,7 @@ fn handle_connection(mut stream: TcpStream) {
 
 fn repond_with_error(stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 404 NOT FOUND";
-    let contents = fs::read_to_string("404.html").unwrap();
+    let contents = fs::read_to_string("static/404.html").unwrap();
     let length = contents.len();
     let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     stream.write_all(response.as_bytes()).unwrap();
