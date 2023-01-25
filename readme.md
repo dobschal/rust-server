@@ -1,6 +1,6 @@
 # Rust Server
 
-Simple server that connects to a MySQL database and returns HTML or JSON.
+Simple server that connects to a MySQL database and returns static files (HTML, CSS, Javascript, Images, ...) or JSON.
 
 ## Get Started
 Follow these steps to get in running:
@@ -29,6 +29,22 @@ Install Cargo and run in terminal:
 cargo run 
 ```
 
-### Test
+### Try it
 Open a browser (or Postman) and call (GET):
 > http://localhost:7878/users
+
+## Extend
+
+In order to extend this implementation, just add new controller methods to the `src/controller` module.
+Expose the new method in `src/controller/mod.rs`.
+
+Then register the method in the `src/main.rs`.
+
+This implementation is based on the `mysql` and `serde` module. Everything should come with rust.
+
+## Known Issues
+
+- [ ] Multi Threading is not implemented
+- [ ] The 404 error should be in JSON or HTML
+- [ ] All JSON REST API paths shoulb start with `/api/v1`
+- [ ] URL query and params handling is not implemented

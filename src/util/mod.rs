@@ -1,5 +1,18 @@
 use std::{io::Write, net::TcpStream};
 
+pub fn empty_string() -> String {
+    return "".to_owned();
+}
+
+pub fn respond_with_content(stream: &mut TcpStream, contents: String) {
+    let length = contents.len();
+    stream
+        .write_all(
+            format!("HTTP/1.1 200 OK\r\nContent-Length: {length}\r\nContent-Type: application/json\r\n\r\n{contents}").as_bytes(),
+        )
+        .unwrap();
+}
+
 pub fn respond_with_success(stream: &mut TcpStream) {
     let contents = "{\"success\": true }".to_owned();
     let length = contents.len();
